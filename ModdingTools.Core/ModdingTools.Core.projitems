@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>26962794-1BD6-48F1-80A1-B7B1BAC87F3F</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>ModdingTools.Core</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CommandShell.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Extensions\IEnumerableEx.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Generators\InitialStructure.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\AbstractCSharpProjectFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\CSProj.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\CSProjReference.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\CSProjResource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\ICSharpProject.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\FileSystemPaths.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\ICreatePluginSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\IPluginGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\LocalDevice.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\OutputInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\PluginGeneratorExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\AbstractPluginGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\BepInEx5PluginGenerator.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\CreateBepInExPluginSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\Generation\BepInEx5CSharpProjectFile.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\Generation\GitIgnoreResource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\Generation\PluginGenerator.Actions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\Generation\PluginGenerator.Resources.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\ICreateBepInExPluginSettings.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\PluginTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\SafeInvoke.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\SolutionCreator.cs" />
+  </ItemGroup>
+</Project>

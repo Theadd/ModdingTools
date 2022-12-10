@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using ModdingTools.Core.Utils;
 
 namespace ModdingTools.Core.PluginGenerator;
 

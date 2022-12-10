@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using ModdingTools.Core.Utils;
 
 namespace ModdingTools.Core.PluginGenerator;
 

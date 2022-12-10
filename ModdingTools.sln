@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModdingTools.App", "Modding
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "ModdingTools.Core", "ModdingTools.Core\ModdingTools.Core.shproj", "{EDFF9DEE-B987-494B-8D84-3CBE31A68576}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModdingTools.Templates", "ModdingTools.Templates\ModdingTools.Templates.csproj", "{5C521800-1F4D-4E30-97BF-8370EF476443}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +19,10 @@ Global
 		{DEFBBD28-FB44-4701-AAA7-65B247587844}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEFBBD28-FB44-4701-AAA7-65B247587844}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEFBBD28-FB44-4701-AAA7-65B247587844}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C521800-1F4D-4E30-97BF-8370EF476443}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C521800-1F4D-4E30-97BF-8370EF476443}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C521800-1F4D-4E30-97BF-8370EF476443}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C521800-1F4D-4E30-97BF-8370EF476443}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -25,6 +31,7 @@ Global
 		SolutionGuid = {4C2EB94E-C398-498E-9C82-026F5D35651C}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		ModdingTools.Core\ModdingTools.Core.projitems*{defbbd28-fb44-4701-aaa7-65b247587844}*SharedItemsImports = 5
 		ModdingTools.Core\ModdingTools.Core.projitems*{edff9dee-b987-494b-8d84-3cbe31a68576}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

@@ -9,10 +9,11 @@
     <Import_RootNamespace>ModdingTools.Core</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Options\GameOptions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Options\TemplateOptions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Class1.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CommandShell.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Extensions\IEnumerableEx.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Generators\InitialStructure.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\AbstractCSharpProjectFile.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\CSProj.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginGenerator\CSharpProjectFile\CSProjReference.cs" />
@@ -33,6 +34,10 @@
     <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\Generation\PluginGenerator.Resources.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\BepInEx5\ICreateBepInExPluginSettings.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PluginTemplates\PluginTemplate.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\CILUtility.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\DLLCache.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\DLLPatchContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\GameUtility.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\SafeInvoke.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Utils\SolutionCreator.cs" />
   </ItemGroup>

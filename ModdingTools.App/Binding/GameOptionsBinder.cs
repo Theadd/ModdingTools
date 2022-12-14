@@ -16,12 +16,14 @@ public class GameOptionsBinder : BinderBase<GameOptions>
     protected override GameOptions GetBoundValue(BindingContext bindingContext)
     {
         var dir = bindingContext.ParseResult.GetValueForOption(_gamePath)!;
+        var gameName = BindingOptionsHelper.GetGameName(dir);
 
         return new GameOptions
         {
             GamePath = dir,
-            GameName = BindingOptionsHelper.GetGameName(dir),
-            UnityPlayerVersion = BindingOptionsHelper.GetUnityPlayerVersion(dir)
+            GameName = gameName,
+            UnityPlayerVersion = BindingOptionsHelper.GetUnityPlayerVersion(dir),
+            ManagedFrameworkVersion = BindingOptionsHelper.GetManagedFrameworkVersion(dir, gameName)
         };
     }
 }

@@ -63,7 +63,7 @@ public static class BindingOptionsHelper
         return version;
     }
     
-    public static string GetManagedFrameworkVersion(DirectoryInfo location, string gameName)
+    public static string GetManagedFrameworkVersion(DirectoryInfo gamePath, string gameName)
     {
         // The available values for TargetFrameworkVersion are v2.0, v3.0, v3.5, v4.5.2, v4.6, v4.6.1, v4.6.2, v4.7, v4.7.1, v4.7.2, and v4.8.
         var version = "net35";
@@ -71,7 +71,7 @@ public static class BindingOptionsHelper
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var managedDirectory = new DirectoryInfo(
-                Path.Combine(Path.Combine(location.FullName, gameName + "_Data"), "Managed"));
+                Path.Combine(Path.Combine(gamePath.FullName, gameName + "_Data"), "Managed"));
             
             var matchingAssemblies = GetDllWithValidDotnetVersion(managedDirectory, "mscorlib*") 
                                      ?? GetDllWithValidDotnetVersion(managedDirectory, "System.Core*");

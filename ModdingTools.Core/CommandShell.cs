@@ -1,11 +1,18 @@
 ﻿using System.Diagnostics;
+using System.Globalization;
 using ModdingTools.Core.Extensions;
 
 namespace ModdingTools.Core;
 
 public class CommandShell
 {
+    private Dictionary<string, string> WorkingTemplateVars { get; } = new();
+    
     public DirectoryInfo WorkingDirectory { get; set; } = new(".");
+    public Dictionary<string, string> TemplateVars
+    {
+        init => value.ToList().ForEach(pair => AddTemplateVar(pair.Key, pair.Value));
+    }
     public int CommandExecutionTimeout { get; set; } = 60000;   // In milliseconds
 
     public CommandShell GoBack() => Ignore(TryGo(".."));
@@ -52,6 +59,17 @@ public class CommandShell
         
         return true;    // TODO
     }
+
+    public CommandShell AddTemplateVar(string key, string value)
+    {
+        WorkingTemplateVars.Add("{{" + key + "}}", value);
+
+        return this;
+    }
+
+    public string SubstituteVars(string source) => 
+        WorkingTemplateVars.Aggregate(source, (content, pair) => 
+            content.Replace(pair.Key, pair.Value, StringComparison.InvariantCulture));
 
     private CommandShell Ignore(bool _) => this;
 }

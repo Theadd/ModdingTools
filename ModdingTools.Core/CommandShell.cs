@@ -6,12 +6,12 @@ namespace ModdingTools.Core;
 
 public class CommandShell
 {
-    private Dictionary<string, string> WorkingTemplateVars { get; } = new();
+    private Dictionary<string, string> WorkingSubstitutionVars { get; } = new();
     
     public DirectoryInfo WorkingDirectory { get; set; } = new(".");
-    public Dictionary<string, string> TemplateVars
+    public Dictionary<string, string> SubstitutionVars
     {
-        init => value.ToList().ForEach(pair => AddTemplateVar(pair.Key, pair.Value));
+        init => value.ToList().ForEach(pair => AddSubstitutionVar(pair.Key, pair.Value));
     }
     public int CommandExecutionTimeout { get; set; } = 60000;   // In milliseconds
 
@@ -60,15 +60,14 @@ public class CommandShell
         return true;    // TODO
     }
 
-    public CommandShell AddTemplateVar(string key, string value)
+    public CommandShell AddSubstitutionVar(string key, string value)
     {
-        WorkingTemplateVars.Add("{{" + key + "}}", value);
-
+        WorkingSubstitutionVars.Add(key, value);
         return this;
     }
 
-    public string SubstituteVars(string source) => 
-        WorkingTemplateVars.Aggregate(source, (content, pair) => 
+    public string Substitute(string source) => 
+        WorkingSubstitutionVars.Aggregate(source, (content, pair) => 
             content.Replace(pair.Key, pair.Value, StringComparison.InvariantCulture));
 
     private CommandShell Ignore(bool _) => this;

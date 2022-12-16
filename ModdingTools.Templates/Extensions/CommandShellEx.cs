@@ -15,12 +15,16 @@ public static class CommandShellEx
 
         return self;
     }
-    
+
+    public static CommandShell WriteTemplate(this CommandShell self, string resourceFile) => self.WriteTemplate(resourceFile, resourceFile);
+
     public static CommandShell WriteTemplate(this CommandShell self, string resourceFile, string targetFilename)
     {
         TemplateResource
             .From(resourceFile)
-            .Write(new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename)));
+            .Write(
+                new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename)),
+                self.Substitute);
 
         return self;
     }

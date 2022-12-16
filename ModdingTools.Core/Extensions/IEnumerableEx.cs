@@ -4,7 +4,7 @@ public static class IEnumerableEx
 {
     public static void Deconstruct<T>(this IEnumerable<T> seq, out T first, out IEnumerable<T> rest)
     {
-        first = seq.FirstOrDefault();
+        first = seq.FirstOrDefault()!;
         rest = seq.Skip(1);
     }
 

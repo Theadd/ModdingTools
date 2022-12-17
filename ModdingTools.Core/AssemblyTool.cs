@@ -15,8 +15,10 @@ public class AssemblyTool
 
     public AssemblyTool WriteAsPublic(FileInfo assemblyFile)
     {
-        AssemblyPublicizer.Publicize(assemblyFile.FullName, Path.Combine(Destination.FullName, assemblyFile.Name));
-        
+        AssemblyPublicizer.Publicize(
+            assemblyFile.FullName, 
+            Path.Combine(Destination.FullName, assemblyFile.Name));
+
         return this;
     }
 }

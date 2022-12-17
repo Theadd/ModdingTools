@@ -4,7 +4,7 @@ using ModdingTools.Core.Options;
 using ModdingTools.Core.PatternMatching;
 using ModdingTools.Templates.Extensions;
 
-namespace ModdingTools.Templates.Writers;
+namespace ModdingTools.Templates.Tasks;
 
 public class InitialStructure : IDisposable
 {
@@ -35,7 +35,7 @@ public class InitialStructure : IDisposable
         var dotnetTemplate = "bepinex5plugin";
         // var dotnetTemplate = "bep6plugin_unity_mono";
 
-        if (!Location.Exists) Location.Create();
+        // if (!Location.Exists) Location.Create();
 
         Shell
             .Write(".gitignore")

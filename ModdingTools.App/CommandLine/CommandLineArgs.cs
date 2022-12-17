@@ -34,6 +34,13 @@ public static class CommandLineArgs
         "Don't actually perform the operation, just check for valid arguments and provide descriptive error messages if any.",
         getDefaultValue: () => false
     );
+    
+    public static Option<bool> QuietOption { get; } = new(
+        name: "--quiet",
+        description:
+        "Quiet or silent mode. It won't send common output messages to stdout but it will still output the data you ask for.",
+        getDefaultValue: () => false
+    );
 
     public static Argument<DirectoryInfo?> EmptyDirectoryArgument { get; } = new(
         name: "directory",

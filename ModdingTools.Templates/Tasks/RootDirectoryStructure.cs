@@ -25,6 +25,7 @@ public class CreateDirectoryStructure : RunnableTask
             .Write(".gitignore")
             .Write(".editorconfig")
             .Go("src", true)
+            .WriteTemplate("Directory.Build.props.template", "Directory.Build.props")
             .GoBack()
             .Go("lib", true)
             .Go("References", true);

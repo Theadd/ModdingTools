@@ -36,6 +36,7 @@ public class CreateCommandShell : RunnableTask
                 { $"{{{{{nameof(AssemblyName)}}}}}", AssemblyName },
                 { $"{{{{{nameof(SolutionName)}}}}}", SolutionName },
                 { $"{{{{{nameof(RootNamespace)}}}}}", RootNamespace },
+                { $"{{{{{nameof(TemplateShortName)}}}}}", TemplateShortName },
                 { $"{{{{{nameof(DryRun)}}}}}", DryRun ? "--dry-run" : "" },
                 { $"{{{{{nameof(QuietMode)}}}}}", QuietMode ? "--quiet" : "" },
             }

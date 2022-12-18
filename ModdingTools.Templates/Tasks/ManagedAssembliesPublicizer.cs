@@ -7,7 +7,7 @@ namespace ModdingTools.Templates.Tasks;
 /// <summary>
 /// Copy publicized game assemblies (*.dll) into CommandShell's WorkingDirectory.
 /// </summary>
-public class PublicizeManagedAssemblies : RunnableTask
+public class ManagedAssembliesPublicizer : RunnableTask
 {
     public CommandShell Shell { get; set; } = default!;
 
@@ -20,9 +20,9 @@ public class PublicizeManagedAssemblies : RunnableTask
         "LeanCommon*dll", "Backtrace.Unity.dll", "Mono.*.dll", "Unity.*.dll"
     };
 
-    protected PublicizeManagedAssemblies(AllOptions allOptions) : base(allOptions) { }
+    protected ManagedAssembliesPublicizer(AllOptions allOptions) : base(allOptions) { }
 
-    public static PublicizeManagedAssemblies Create(AllOptions allOptions) => new(allOptions);
+    public static ManagedAssembliesPublicizer Create(AllOptions allOptions) => new(allOptions);
 
     public async Task<bool> InvokeAsync(CommandShell shell) =>
         await Task.Run(() => 

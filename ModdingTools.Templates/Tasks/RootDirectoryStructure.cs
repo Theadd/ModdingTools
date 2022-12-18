@@ -7,13 +7,13 @@ namespace ModdingTools.Templates.Tasks;
 /// <summary>
 /// Copy publicized game assemblies (*.dll) into CommandShell's WorkingDirectory.
 /// </summary>
-public class CreateDirectoryStructure : RunnableTask
+public class RootDirectoryStructure : RunnableTask
 {
     public CommandShell Shell { get; set; } = default!;
 
-    protected CreateDirectoryStructure(AllOptions allOptions) : base(allOptions) { }
+    protected RootDirectoryStructure(AllOptions allOptions) : base(allOptions) { }
 
-    public static CreateDirectoryStructure Create(AllOptions allOptions) => new(allOptions);
+    public static RootDirectoryStructure Create(AllOptions allOptions) => new(allOptions);
 
     public async Task<bool> InvokeAsync(CommandShell shell) =>
         await Task.Run(() => 
@@ -28,7 +28,7 @@ public class CreateDirectoryStructure : RunnableTask
             .WriteTemplate("Directory.Build.props.template", "Directory.Build.props")
             .GoBack()
             .Go("lib", true)
-            .Go("References", true);
+            .Go("references", true);
         
         return true;
     }

@@ -9,10 +9,15 @@ public static class CommandShellEx
 
     public static CommandShell Write(this CommandShell self, string resourceFile, string targetFilename)
     {
-        TemplateResource
-            .From(resourceFile)
-            .Write(new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename)));
-
+        var targetFile = new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename));
+        self.Tree?.Write(targetFile);
+        self.Trigger("Write", CommandShell.Quote(targetFilename), self.DryRun, () =>
+        {
+            TemplateResource
+                .From(resourceFile)
+                .Write(targetFile);
+        });
+        
         return self;
     }
 
@@ -20,12 +25,15 @@ public static class CommandShellEx
 
     public static CommandShell WriteTemplate(this CommandShell self, string resourceFile, string targetFilename)
     {
-        TemplateResource
-            .From(resourceFile)
-            .Write(
-                new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename)),
-                self.Substitute);
-
+        var targetFile = new FileInfo(Path.Combine(self.WorkingDirectory.FullName, targetFilename));
+        self.Tree?.Write(targetFile);
+        self.Trigger("Write", CommandShell.Quote(targetFilename), self.DryRun, () =>
+        {
+            TemplateResource
+                .From(resourceFile)
+                .Write(targetFile, self.Substitute);
+        });
+        
         return self;
     }
 }

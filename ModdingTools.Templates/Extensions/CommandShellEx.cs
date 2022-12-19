@@ -36,4 +36,22 @@ public static class CommandShellEx
         
         return self;
     }
+    
+    /// <summary>
+    /// Unzip contents from a zip file in the Resources folder to CommandShell's current WorkingDirectory.
+    /// </summary>
+    /// <param name="self"></param>
+    /// <param name="resourceFile"></param>
+    /// <returns></returns>
+    public static CommandShell Unzip(this CommandShell self, string resourceFile)
+    {
+        self.Trigger("Unzip", CommandShell.Quote(resourceFile), self.DryRun, () =>
+        {
+            TemplateResource
+                .From(resourceFile)
+                .UnZip(self.WorkingDirectory, self.Substitute);
+        });
+        
+        return self;
+    }
 }

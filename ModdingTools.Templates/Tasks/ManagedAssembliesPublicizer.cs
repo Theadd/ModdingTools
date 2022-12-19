@@ -9,8 +9,6 @@ namespace ModdingTools.Templates.Tasks;
 /// </summary>
 public class ManagedAssembliesPublicizer : RunnableTask
 {
-    public CommandShell Shell { get; set; } = default!;
-
     public static List<string> AssemblyIgnorePatterns { get; } = new()
     {
         "UnityEngine*dll", "System.*ll", "Photo*-DotNet.dll", "Newtonsoft.Json.dll",
@@ -23,11 +21,7 @@ public class ManagedAssembliesPublicizer : RunnableTask
     protected ManagedAssembliesPublicizer(AllOptions allOptions) : base(allOptions) { }
 
     public static ManagedAssembliesPublicizer Create(AllOptions allOptions) => new(allOptions);
-
-    public async Task<bool> InvokeAsync(CommandShell shell) =>
-        await Task.Run(() => 
-            SafeInvoke.All(false, () => SafeInvoke.TryInvoke(() => Shell = shell), Invoke));
-
+    
     protected override bool Invoke()
     {
         var asmTool = new AssemblyTool() { Destination = Shell.WorkingDirectory };

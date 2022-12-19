@@ -1,6 +1,5 @@
 ﻿using ModdingTools.Core;
 using ModdingTools.Core.Options;
-using ModdingTools.Templates.Extensions;
 
 namespace ModdingTools.Templates.Tasks;
 
@@ -10,16 +9,10 @@ namespace ModdingTools.Templates.Tasks;
 /// </summary>
 public class DotnetBepInExTemplates : RunnableTask
 {
-    public CommandShell Shell { get; set; } = default!;
-
     protected DotnetBepInExTemplates(AllOptions allOptions) : base(allOptions) { }
 
     public static DotnetBepInExTemplates Create(AllOptions allOptions) => new(allOptions);
-
-    public async Task<bool> InvokeAsync(CommandShell shell) =>
-        await Task.Run(() => 
-            SafeInvoke.All(false, () => SafeInvoke.TryInvoke(() => Shell = shell), Invoke));
-
+    
     protected override bool Invoke()
     {
         Shell

@@ -81,16 +81,22 @@ public static class CommandLineArgs
     public static Option<string?> SolutionNameOption { get; } = new(
         name: "--solution-name",
         description: "Visual Studio Solution (*.sln) name. [default: Inherits from <directory>]"
-    )
-    {
-        IsHidden = true
-    };
+    );
 
     public static Option<string?> RootNamespaceOption { get; } = new(
         name: "--root-namespace",
         description: "Root namespace name. [default: Same as project name]"
-    )
-    {
-        IsHidden = true
-    };
+    );
+    
+    public static Option<string?> DotnetNewTemplateShortNameOption { get; } = new(
+        name: "--template",
+        description: "The short name of a `dotnet new` template.",
+        getDefaultValue: () => "bepinex5plugin"
+    );
+    
+    public static Argument<DirectoryInfo?> TargetArgument { get; } = new(
+        name: "target",
+        description: "If you provide a directory, the command is run inside it.",
+        getDefaultValue: () => new DirectoryInfo(".")
+    );
 }

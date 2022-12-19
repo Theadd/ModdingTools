@@ -47,22 +47,7 @@ public static class CommandLineArgs
         description:
         "If you provide a directory, the command is run inside it. If this directory already exists, it must be an empty directory.",
         isDefault: true,
-        parse: result =>
-        {
-            DirectoryInfo directory =
-                new DirectoryInfo(result.Tokens.Count == 0 ? "." : result.Tokens.Single().Value);
-
-            // TODO: Is "Target directory must be an empty directory." still being required?
-            /*if (directory.Exists &&
-                (directory.GetDirectories().Length != 0 || directory.GetFiles().Length != 0))
-            {
-                result.ErrorMessage = "Target directory must be an empty directory.";
-                return null;
-            }*/
-
-            return directory;
-        }
-    );
+        parse: result => new DirectoryInfo(result.Tokens.Count == 0 ? "." : result.Tokens.Single().Value));
 
     public static Option<string?> InitialProjectNameOption { get; } = new(
         name: "--name",

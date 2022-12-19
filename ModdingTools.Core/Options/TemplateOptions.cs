@@ -5,7 +5,8 @@ public record TemplateOptionsRecord(
     string ProjectName, 
     string AssemblyName,
     string SolutionName,
-    string RootNamespace);
+    string RootNamespace,
+    string TemplateShortName);
 
 public class TemplateOptions
 {
@@ -14,13 +15,14 @@ public class TemplateOptions
     public string? AssemblyName { get; set; }
     public string? SolutionName { get; set; }
     public string? RootNamespace { get; set; }
+    public string? TemplateShortName { get; set; }
 
-    public (DirectoryInfo, string, string, string, string) AsTuple() =>
-        (Location!, ProjectName!, AssemblyName!, SolutionName!, RootNamespace!);
+    public (DirectoryInfo, string, string, string, string, string) AsTuple() =>
+        (Location!, ProjectName!, AssemblyName!, SolutionName!, RootNamespace!, TemplateShortName!);
     
     public TemplateOptionsRecord AsRecord() =>
-        new (Location!, ProjectName!, AssemblyName!, SolutionName!, RootNamespace!);
+        new (Location!, ProjectName!, AssemblyName!, SolutionName!, RootNamespace!, TemplateShortName!);
 
     public override string ToString() =>
-        $"\tLocation = {Location!.FullName}\n\tProjectName = {ProjectName}\n\tAssemblyName = {AssemblyName}\n\tSolutionName = {SolutionName}\n\tRootNamespace = {RootNamespace}";
+        $"\tLocation = {Location!.FullName}\n\tProjectName = {ProjectName}\n\tAssemblyName = {AssemblyName}\n\tSolutionName = {SolutionName}\n\tRootNamespace = {RootNamespace}\n\tTemplateShortName = {TemplateShortName}";
 }

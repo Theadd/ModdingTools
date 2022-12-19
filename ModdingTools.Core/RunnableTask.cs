@@ -20,6 +20,8 @@ public abstract class RunnableTask
     public DirectoryInfo ManagedAssembliesPath => 
         new (Path.Combine(Path.Combine(GamePath.FullName, GameName + "_Data"), "Managed"));
 
+    public CommandShell Shell { get; set; } = default!;
+
     protected RunnableTask(AllOptions allOptions)
     {
         (GamePath, GameName, UnityPlayerVersion, ManagedFrameworkVersion) = allOptions.GameOptions;
@@ -29,4 +31,8 @@ public abstract class RunnableTask
     }
 
     protected abstract bool Invoke();
+
+    public async Task<bool> InvokeAsync(CommandShell shell) =>
+        await Task.Run(() => 
+            SafeInvoke.All(false, () => SafeInvoke.TryInvoke(() => Shell = shell), Invoke));
 }

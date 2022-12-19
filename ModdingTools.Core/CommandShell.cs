@@ -1,17 +1,20 @@
 ﻿using System.Diagnostics;
 using ModdingTools.Core.Extensions;
+using ModdingTools.Core.PatternMatching;
 
 namespace ModdingTools.Core;
 
 public class CommandShell
 {
     private Dictionary<string, string> WorkingSubstitutionVars { get; } = new();
+    
+    public static bool DebugMode { get; set; } = false;
 
     public event Action<CommandShellEntry> OnAction;
     public bool DryRun { get; init; } = false;
     public bool QuietMode { get; init; } = false;
     public DirectoryInfo WorkingDirectory { get; private set; } = new(".");
-    public List<string> AllowedCommandNamesInDryRun { get; set; } = new () { "dotnet" };
+    public FileTree? Tree { get; init; }
     public int CommandExecutionTimeout { get; set; } = 60000; // In milliseconds
     public Dictionary<string, string> SubstitutionVars
     {
@@ -20,8 +23,8 @@ public class CommandShell
     
     public CommandShell SetWorkingDirectory(string nextWorkingDirectory)
     {
-        var path = Substitute(nextWorkingDirectory);
-
+        var path = Path.GetFullPath(Substitute(nextWorkingDirectory));
+        
         return SetWorkingDirectory(new DirectoryInfo(
             Path.IsPathRooted((string?) path) ? path : Path.Combine(WorkingDirectory.FullName, path)));
     }
@@ -29,8 +32,11 @@ public class CommandShell
     public CommandShell SetWorkingDirectory(DirectoryInfo nextWorkingDirectory)
     {
         var relativePath = Path.GetRelativePath(WorkingDirectory.FullName, nextWorkingDirectory.FullName);
+        
+        if (WorkingDirectory.FullName.Equals(nextWorkingDirectory.FullName, StringComparison.InvariantCultureIgnoreCase))
+            return this;
 
-        if (!nextWorkingDirectory.Exists)
+        if (!nextWorkingDirectory.Exists && !(DryRun && (Tree?.Exists(nextWorkingDirectory) ?? false)))
             Trigger("mkdir", Quote(relativePath), DryRun, nextWorkingDirectory.Create);
 
         Trigger("cd", Quote(relativePath));
@@ -39,7 +45,7 @@ public class CommandShell
         return this;
     }
 
-    private void Trigger(string cmdName, string cmdArgs, bool skipExecution, Action actionToExecute)
+    public void Trigger(string cmdName, string cmdArgs, bool skipExecution, Action actionToExecute)
     {
         Trigger(cmdName, cmdArgs, skipExecution);
 
@@ -47,7 +53,7 @@ public class CommandShell
             actionToExecute.Invoke();
     }
 
-    private void Trigger(string cmdName, string cmdArgs = "", bool skipExecution = false)
+    public void Trigger(string cmdName, string cmdArgs = "", bool skipExecution = false)
     {
         var entry = new CommandShellEntry(cmdName, cmdArgs, skipExecution, DryRun, QuietMode);
         OnAction += NoopShellAction;
@@ -55,7 +61,7 @@ public class CommandShell
         OnAction -= NoopShellAction;
     }
 
-    public CommandShell GoBack() => Ignore(TryGo(".."));
+    public CommandShell GoBack() => Ignore(TryGo("..", true));
 
     public CommandShell Go(string directoryName, bool createIfNotExists = false) =>
         Ignore(TryGo(directoryName, createIfNotExists));
@@ -71,9 +77,9 @@ public class CommandShell
         return SetWorkingDirectory(nextWorkingDir) is { } _;
     }
 
-    public CommandShell Exec(string command) => Ignore(TryExec(command));
+    public CommandShell Exec(string command, bool executeInDryRun = false) => Ignore(TryExec(command, executeInDryRun));
 
-    public bool TryExec(string command)
+    public bool TryExec(string command, bool executeInDryRun = false)
     {
         var (cmdName, cmdArgs, _) = Substitute(command).Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
         var process = new Process
@@ -90,7 +96,7 @@ public class CommandShell
             }
         };
         
-        Trigger(cmdName, cmdArgs, DryRun && !AllowedCommandNamesInDryRun.Contains(cmdName), () =>
+        Trigger(cmdName, cmdArgs, DryRun && !executeInDryRun, () =>
         {
             process.Start();
             // process.BeginOutputReadLine();

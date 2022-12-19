@@ -19,7 +19,9 @@ class Program
 
         rootCommand.AddGlobalOption(CommandLineArgs.DryRunOption);
         var createCommand = CommandNew.Create();
+        var infoCommand = CommandInfo.Create();
         rootCommand.AddCommand(createCommand);
+        rootCommand.AddCommand(infoCommand);
 
 
         try

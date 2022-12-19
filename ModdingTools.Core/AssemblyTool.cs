@@ -1,4 +1,8 @@
-﻿using BepInEx.AssemblyPublicizer;
+﻿using AsmResolver;
+using AsmResolver.DotNet;
+using AsmResolver.DotNet.Serialized;
+using AsmResolver.PE;
+using BepInEx.AssemblyPublicizer;
 
 namespace ModdingTools.Core;
 

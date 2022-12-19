@@ -55,4 +55,17 @@ public static class SafeInvoke
 
         return success;
     }
+
+    public static T? Invoke<T>(Func<T> action, bool quiet = false)
+    {
+        try
+        {
+            return action.Invoke();
+        }
+        catch (Exception e)
+        {
+            if (!quiet) Console.WriteLine(e);
+            return default;
+        }
+    }
 }

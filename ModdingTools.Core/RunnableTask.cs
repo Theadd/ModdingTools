@@ -13,6 +13,7 @@ public abstract class RunnableTask
     public string AssemblyName { get; }
     public string SolutionName { get; }
     public string RootNamespace { get; }
+    public string TemplateShortName { get; }
     public bool DryRun { get; }
     public bool QuietMode { get; }
     
@@ -22,7 +23,7 @@ public abstract class RunnableTask
     protected RunnableTask(AllOptions allOptions)
     {
         (GamePath, GameName, UnityPlayerVersion, ManagedFrameworkVersion) = allOptions.GameOptions;
-        (Location, ProjectName, AssemblyName, SolutionName, RootNamespace) = allOptions.TemplateOptions;
+        (Location, ProjectName, AssemblyName, SolutionName, RootNamespace, TemplateShortName) = allOptions.TemplateOptions;
         DryRun = allOptions.DryRun;
         QuietMode = allOptions.QuietMode;
     }

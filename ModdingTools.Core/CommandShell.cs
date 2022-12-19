@@ -1,24 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Globalization;
 using ModdingTools.Core.Extensions;
 
 namespace ModdingTools.Core;
-
-public static class ShellLogger
-{
-    public static void LogExec(string cmdName, string cmdArgs = "")
-    {
-        Console.ForegroundColor = ConsoleColor.Yellow;
-        Console.Write("$ ");
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.Write($"{cmdName}");
-        Console.ForegroundColor = ConsoleColor.White;
-        Console.WriteLine($" {cmdArgs}");
-        Console.ResetColor();
-    }
-}
-
-public record CommandShellEntry(string CommandName, string CommandArgs, bool SkipExecution, bool DryRun, bool QuietMode);
 
 public class CommandShell
 {
@@ -28,34 +11,42 @@ public class CommandShell
     public bool DryRun { get; init; } = false;
     public bool QuietMode { get; init; } = false;
     public DirectoryInfo WorkingDirectory { get; private set; } = new(".");
-
+    public List<string> AllowedCommandNamesInDryRun { get; set; } = new () { "dotnet" };
+    public int CommandExecutionTimeout { get; set; } = 60000; // In milliseconds
     public Dictionary<string, string> SubstitutionVars
     {
         init => value.ToList().ForEach(pair => AddSubstitutionVar(pair.Key, pair.Value));
     }
+    
+    public CommandShell SetWorkingDirectory(string nextWorkingDirectory)
+    {
+        var path = Substitute(nextWorkingDirectory);
 
-    public int CommandExecutionTimeout { get; set; } = 60000; // In milliseconds
+        return SetWorkingDirectory(new DirectoryInfo(
+            Path.IsPathRooted((string?) path) ? path : Path.Combine(WorkingDirectory.FullName, path)));
+    }
 
     public CommandShell SetWorkingDirectory(DirectoryInfo nextWorkingDirectory)
     {
         var relativePath = Path.GetRelativePath(WorkingDirectory.FullName, nextWorkingDirectory.FullName);
-        
-        if (!nextWorkingDirectory.Exists) 
+
+        if (!nextWorkingDirectory.Exists)
             Trigger("mkdir", Quote(relativePath), DryRun, nextWorkingDirectory.Create);
 
         Trigger("cd", Quote(relativePath));
         WorkingDirectory = nextWorkingDirectory;
-        
+
         return this;
     }
 
     private void Trigger(string cmdName, string cmdArgs, bool skipExecution, Action actionToExecute)
     {
         Trigger(cmdName, cmdArgs, skipExecution);
-        
+
         if (!skipExecution)
             actionToExecute.Invoke();
     }
+
     private void Trigger(string cmdName, string cmdArgs = "", bool skipExecution = false)
     {
         var entry = new CommandShellEntry(cmdName, cmdArgs, skipExecution, DryRun, QuietMode);
@@ -63,7 +54,7 @@ public class CommandShell
         OnAction(entry);
         OnAction -= NoopShellAction;
     }
-    
+
     public CommandShell GoBack() => Ignore(TryGo(".."));
 
     public CommandShell Go(string directoryName, bool createIfNotExists = false) =>
@@ -85,26 +76,27 @@ public class CommandShell
     public bool TryExec(string command)
     {
         var (cmdName, cmdArgs, _) = Substitute(command).Split(' ', 2, StringSplitOptions.RemoveEmptyEntries);
-        ShellLogger.LogExec(cmdName, cmdArgs);
-
         var process = new Process
         {
             StartInfo = new ProcessStartInfo
             {
                 FileName = cmdName,
                 Arguments = cmdArgs,
-                RedirectStandardOutput = false,
-                RedirectStandardError = false,
+                RedirectStandardOutput = QuietMode,
+                RedirectStandardError = QuietMode,
                 UseShellExecute = false,
                 CreateNoWindow = false,
                 WorkingDirectory = WorkingDirectory.FullName
             }
         };
-
-        process.Start();
-        // process.BeginOutputReadLine();
-        process.WaitForExit(CommandExecutionTimeout);
-
+        
+        Trigger(cmdName, cmdArgs, DryRun && !AllowedCommandNamesInDryRun.Contains(cmdName), () =>
+        {
+            process.Start();
+            // process.BeginOutputReadLine();
+            process.WaitForExit(CommandExecutionTimeout);
+        });
+        
         return true; // TODO
     }
 
@@ -119,9 +111,16 @@ public class CommandShell
             content.Replace(pair.Key, pair.Value, StringComparison.InvariantCulture));
 
     private CommandShell Ignore(bool _) => this;
-    
+
     public static void NoopShellAction(CommandShellEntry _) { }
 
-    public static string Quote(string value, bool quoteAlways = false) => 
+    public static string Quote(string value, bool quoteAlways = false) =>
         quoteAlways || value.Contains(' ') ? $"\"{value}\"" : value;
+    
+    public record CommandShellEntry(
+        string CommandName, 
+        string CommandArgs, 
+        bool SkipExecution, 
+        bool DryRun,
+        bool QuietMode);
 }

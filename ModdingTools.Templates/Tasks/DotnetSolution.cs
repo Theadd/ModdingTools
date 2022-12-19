@@ -23,8 +23,15 @@ public class DotnetSolution : RunnableTask
     protected override bool Invoke()
     {
         Shell
-            .Exec("dotnet new sln -n {{SolutionName}}");
+            .Exec("dotnet new sln -n " + CommandShell.Quote(SolutionName));
 
+        UpdateFileTree();
+        
         return true;
+    }
+
+    private void UpdateFileTree()
+    {
+        Shell.Tree?.Write(new FileInfo(Path.Combine(Shell.WorkingDirectory.FullName, SolutionName + ".sln")));
     }
 }

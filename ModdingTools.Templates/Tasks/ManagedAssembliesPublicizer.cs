@@ -35,8 +35,13 @@ public class ManagedAssembliesPublicizer : RunnableTask
         
         foreach (var dll in ManagedAssembliesPath.GetFiles("*.dll"))
             if (!ignoreMatches.IsMatch(dll))
-                asmTool.TryWriteAsPublic(dll);
-
+            {
+                Shell.Tree?.Write(GetAssemblyDestinationFile(dll));
+                Shell.Trigger("Write", dll.Name, DryRun, () => asmTool.TryWriteAsPublic(dll));
+            }
         return true;
     }
+
+    private FileInfo GetAssemblyDestinationFile(FileInfo dll) =>
+        new FileInfo(Path.Combine(Shell.WorkingDirectory.FullName, dll.Name));
 }

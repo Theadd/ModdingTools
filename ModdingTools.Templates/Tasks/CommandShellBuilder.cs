@@ -1,5 +1,6 @@
 ﻿using ModdingTools.Core;
 using ModdingTools.Core.Options;
+using ModdingTools.Core.PatternMatching;
 
 namespace ModdingTools.Templates.Tasks;
 
@@ -25,6 +26,7 @@ public class CommandShellBuilder : RunnableTask
         {
             DryRun = DryRun,
             QuietMode = QuietMode,
+            Tree = new FileTree() { Node = Location },
             SubstitutionVars = new Dictionary<string, string>()
             {
                 { $"{{{{{nameof(GamePath)}}}}}", GamePath.FullName },

@@ -22,10 +22,20 @@ public class DotnetProjectTemplate : RunnableTask
 
     protected override bool Invoke()
     {
+        var pName = CommandShell.Quote(ProjectName);
+        
         Shell
-            .Exec("dotnet new {{TemplateShortName}} -n {{ProjectName}} -o {{ProjectName}} --force -T {{ManagedFrameworkVersion}} -U {{UnityPlayerVersion}} -D \"A BepInEx plugin for the {{GameName}} game.\"")
-            .Exec("dotnet sln add {{ProjectName}}/{{ProjectName}}.csproj");
+            .Exec("dotnet new {{TemplateShortName}} -n " + pName + " -o " + pName + " --force -T {{ManagedFrameworkVersion}} -U {{UnityPlayerVersion}} -D \"A BepInEx plugin for the {{GameName}} game.\"")
+            .Exec($"dotnet sln add {pName}/{pName}.csproj");
+
+        UpdateFileTree();
 
         return true;
+    }
+    
+    private void UpdateFileTree()
+    {
+        Shell.Tree?.Write(new FileInfo(Path.Combine(Shell.WorkingDirectory.FullName, $"{ProjectName}/{ProjectName}.csproj")));
+        Shell.Tree?.Write(new FileInfo(Path.Combine(Shell.WorkingDirectory.FullName, $"{ProjectName}/Plugin.cs")));
     }
 }

@@ -84,4 +84,24 @@ public static class CommandLineArgs
         description: "If you provide a directory, the command is run inside it.",
         getDefaultValue: () => new DirectoryInfo(".")
     );
+
+    public static Argument<string> ProjectNameArgument { get; } = new(
+        name: "project-name",
+        description:
+        "Just don't name it the same as another existing project, otherwise you'll rewrite the " +
+        "contents of the files with the same name. To organize your new projects in subdirectories, " +
+        "use the slash character to create them (e.g.: Libs/CoreUtils)."
+    )
+    {
+        Arity = ArgumentArity.ExactlyOne
+    };
+    
+    public static Argument<string> KickstartTemplateArgument { get; } = new(
+        name: "template",
+        description:
+        "Pick a template from the provided ones. (Note: Documentation needed here)."
+    )
+    {
+        Arity = ArgumentArity.ExactlyOne
+    };
 }

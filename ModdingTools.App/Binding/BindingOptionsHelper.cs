@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using ModdingTools.Core.Extensions;
 
 namespace ModdingTools.App.Binding;
@@ -42,11 +43,12 @@ public static class BindingOptionsHelper
             .GetFiles(gameName + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ""))
             .FirstOrDefault(default(FileInfo));
 
-    public static string GetUnityPlayerVersion(DirectoryInfo location)
+    public static string GetUnityPlayerVersion(DirectoryInfo? location)
     {
         // UnityEngine.Modules v5.6.0 will be used if no version is found.
         var version = "5.6.0";
-
+        if (location == null) return version;
+        
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var unityPlayer = location.GetFiles("UnityPlayer*").FirstOrDefault(
@@ -76,10 +78,11 @@ public static class BindingOptionsHelper
         return version;
     }
 
-    public static string GetManagedFrameworkVersion(DirectoryInfo gamePath, string gameName)
+    public static string GetManagedFrameworkVersion(DirectoryInfo? gamePath, string gameName)
     {
         // The available values for TargetFrameworkVersion are v2.0, v3.0, v3.5, v4.5.2, v4.6, v4.6.1, v4.6.2, v4.7, v4.7.1, v4.7.2, and v4.8.
         var version = "net35";
+        if (gamePath == null) return version;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
@@ -139,4 +142,18 @@ public static class BindingOptionsHelper
                 return false;
             },
             null);
+    
+    public static DirectoryInfo? GetGamePathFromConfigurationFilesFrom(DirectoryInfo targetPath)
+    {
+        FileInfo? dbp = (targetPath.GetDirectory("src") ?? targetPath).GetFile("Directory.Build.props");
+        if (dbp == null) return null;
+        
+        XElement root = XElement.Load(dbp.FullName);
+        XElement? gamePathX = root.Elements("PropertyGroup")
+            .Where(el => el.HasElements && el.Elements("GAME_PATH").Any())
+            .FirstOrDefault(default(XElement))
+            ?.Element("GAME_PATH");
+
+        return gamePathX == null ? null : new DirectoryInfo(gamePathX.Value);
+    }
 }

@@ -9,8 +9,12 @@ namespace ModdingTools.App.CommandLine;
 
 public static class CommandNew
 {
+    private static Command? Instance { get; set; } = default;
+    
     public static Command Create()
     {
+        if (Instance != null) return Instance;
+        
         var cmd = new Command("new", "Create a new mod project for your game.")
         {
             CommandLineArgs.GameOption,
@@ -27,39 +31,21 @@ public static class CommandNew
             {
                 await Run(gameOptions, templateOptions, dryRun, quiet);
             },
-            new GameOptionsBinder(CommandLineArgs.GameOption),
+            new GameOptionsBinder(
+                CommandLineArgs.GameOption,
+                CommandLineArgs.EmptyDirectoryArgument),
             new TemplateOptionsBinder(
-                CommandLineArgs.EmptyDirectoryArgument!,
-                CommandLineArgs.InitialProjectNameOption!,
-                CommandLineArgs.AssemblyNameOption!,
-                CommandLineArgs.SolutionNameOption!,
-                CommandLineArgs.RootNamespaceOption!,
-                CommandLineArgs.DotnetNewTemplateShortNameOption!),
+                CommandLineArgs.EmptyDirectoryArgument,
+                CommandLineArgs.InitialProjectNameOption,
+                CommandLineArgs.AssemblyNameOption,
+                CommandLineArgs.SolutionNameOption,
+                CommandLineArgs.RootNamespaceOption,
+                CommandLineArgs.DotnetNewTemplateShortNameOption),
             CommandLineArgs.DryRunOption,
             CommandLineArgs.QuietOption
         );
 
-        return cmd;
-    }
-
-    private static IEnumerable<ConsoleColor> ColorPaletteA = new[]
-        { ConsoleColor.DarkGray, ConsoleColor.Green, ConsoleColor.White };
-    private static IEnumerable<ConsoleColor> ColorPaletteB = new[]
-        { ConsoleColor.DarkGray, ConsoleColor.Green, ConsoleColor.Yellow };
-
-    private static void DisplayCommandShellEntry(CommandShell.CommandShellEntry entry)
-    {
-        if (entry.QuietMode) return;
-
-        var palette = (entry.CommandName is "Write" or "dotnet" ? ColorPaletteB : ColorPaletteA).ToArray();
-
-        Console.ForegroundColor = palette.ElementAt(0);
-        Console.Write("$ ");
-        Console.ForegroundColor = palette.ElementAt(1);
-        Console.Write($"{entry.CommandName}");
-        Console.ForegroundColor = palette.ElementAt(2);
-        Console.WriteLine($" {entry.CommandArgs}");
-        Console.ResetColor();
+        return (Instance = cmd);
     }
 
     private static async Task Run(GameOptions gameOptions, TemplateOptions templateOptions, bool dryRun,
@@ -68,7 +54,7 @@ public static class CommandNew
         var allOptions = new AllOptions(gameOptions.AsRecord(), templateOptions.AsRecord(), dryRun, quiet);
         var shell = CommandShellBuilder.Create(allOptions);
 
-        shell.OnAction += DisplayCommandShellEntry;
+        shell.OnAction += CommandLineHelper.DisplayCommandShellEntry;
 
         var success =
             SafeInvoke.All(quiet,
@@ -110,6 +96,6 @@ public static class CommandNew
         string json = JsonConvert.SerializeObject(shell.Tree, Formatting.Indented);
         Console.WriteLine(json);
         
-        shell.OnAction -= DisplayCommandShellEntry;
+        shell.OnAction -= CommandLineHelper.DisplayCommandShellEntry;
     }
 }

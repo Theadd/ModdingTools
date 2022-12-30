@@ -19,7 +19,8 @@ public class JsonLib
             {
                 new FileSystemInfoConverter()
             },
-            Formatting = Formatting.Indented
+            Formatting = Formatting.Indented,
+            NullValueHandling = NullValueHandling.Ignore
         };
         
         return JsonConvert.SerializeObject(obj, settings);

@@ -1,6 +1,7 @@
 ﻿using System.CommandLine;
 using ModdingTools.App.Binding;
 using ModdingTools.Core;
+using ModdingTools.Core.Common;
 using ModdingTools.Core.Options;
 using ModdingTools.Templates.Tasks;
 using Newtonsoft.Json;
@@ -22,14 +23,17 @@ public static class CommandNew
             CommandLineArgs.AssemblyNameOption,
             CommandLineArgs.SolutionNameOption,
             CommandLineArgs.RootNamespaceOption,
-            CommandLineArgs.DotnetNewTemplateShortNameOption
+            CommandLineArgs.DotnetNewTemplateShortNameOption,
+            CommandLineArgs.JsonOption,
+            CommandLineArgs.ShowConfigOption,
+            CommandLineArgs.ShowFsOption
         };
 
         cmd.AddArgument(CommandLineArgs.EmptyDirectoryArgument);
         cmd.SetHandler(
-            async (gameOptions, templateOptions, dryRun, quiet) =>
+            async (gameOptions, templateOptions, inJson, showConfig, showFs, dryRun, quiet) =>
             {
-                await Run(gameOptions, templateOptions, dryRun, quiet);
+                await Run(gameOptions, templateOptions, inJson, showConfig, showFs, dryRun, quiet);
             },
             new GameOptionsBinder(
                 CommandLineArgs.GameOption,
@@ -41,6 +45,9 @@ public static class CommandNew
                 CommandLineArgs.SolutionNameOption,
                 CommandLineArgs.RootNamespaceOption,
                 CommandLineArgs.DotnetNewTemplateShortNameOption),
+            CommandLineArgs.JsonOption,
+            CommandLineArgs.ShowConfigOption,
+            CommandLineArgs.ShowFsOption,
             CommandLineArgs.DryRunOption,
             CommandLineArgs.QuietOption
         );
@@ -48,10 +55,17 @@ public static class CommandNew
         return (Instance = cmd);
     }
 
-    private static async Task Run(GameOptions gameOptions, TemplateOptions templateOptions, bool dryRun,
-        bool quiet)
+    private static async Task Run(GameOptions gameOptions, TemplateOptions templateOptions, bool inJson, 
+        bool showConfig, bool showFs, bool dryRun, bool quiet)
     {
         var allOptions = new AllOptions(gameOptions.AsRecord(), templateOptions.AsRecord(), dryRun, quiet);
+
+        if (dryRun && quiet && !showFs && showConfig)
+        {
+            JsonLib.Print(new ShowOptions() { Config = allOptions });
+            return;
+        }
+        
         var shell = CommandShellBuilder.Create(allOptions);
 
         shell.OnAction += CommandLineHelper.DisplayCommandShellEntry;
@@ -93,9 +107,22 @@ public static class CommandNew
                 // TODO: Type = MonoBehaviour
             );
 
-        string json = JsonConvert.SerializeObject(shell.Tree, Formatting.Indented);
-        Console.WriteLine(json);
-        
+        if (showFs || showConfig)
+        {
+            if (inJson)
+            {
+                JsonLib.Print(new ShowOptions()
+                {
+                    Config = showConfig ? allOptions : null,
+                    FileSystem = showFs ? shell.Tree : null
+                });
+            }
+            else
+            {
+                // TODO
+            }
+        }
+
         shell.OnAction -= CommandLineHelper.DisplayCommandShellEntry;
     }
 }

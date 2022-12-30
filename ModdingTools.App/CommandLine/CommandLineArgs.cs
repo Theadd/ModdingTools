@@ -104,4 +104,25 @@ public static class CommandLineArgs
     {
         Arity = ArgumentArity.ExactlyOne
     };
+    
+    public static Option<bool> JsonOption { get; } = new(
+        name: "--json",
+        description:
+        "Returns a JSON formatted string.",
+        getDefaultValue: () => false
+    );
+    
+    public static Option<bool> ShowConfigOption { get; } = new(
+        name: "--show-config",
+        description:
+        "Show all config values.",
+        getDefaultValue: () => false
+    );
+    
+    public static Option<bool> ShowFsOption { get; } = new(
+        name: "--show-fs",
+        description:
+        "Show generated file system structure.",
+        getDefaultValue: () => false
+    );
 }

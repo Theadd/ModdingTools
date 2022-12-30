@@ -1,0 +1,18 @@
+<Project>
+
+  <PropertyGroup>
+    <GAME_PATH>{{GamePath}}</GAME_PATH>
+  </PropertyGroup>
+  
+  <Target Name="PostBuildCopyFiles" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Debug' ">
+    <ItemGroup>
+      <FilesToCopy Include="$(TargetPath)"/>
+    </ItemGroup>
+    <Copy SourceFiles="@(FilesToCopy)" DestinationFolder="$(GAME_PATH)\BepInEx\scripts\"/>
+  </Target>
+  
+  <ItemGroup>
+    <Reference Include="$(MSBuildThisFileDirectory)..\lib\references\*.dll" />
+  </ItemGroup>
+  
+</Project>

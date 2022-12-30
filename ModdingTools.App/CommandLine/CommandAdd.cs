@@ -8,46 +8,40 @@ using Newtonsoft.Json;
 
 namespace ModdingTools.App.CommandLine;
 
-public static class CommandNew
+public static class CommandAdd
 {
     private static Command? Instance { get; set; } = default;
-    
+
     public static Command Create()
     {
         if (Instance != null) return Instance;
         
-        var cmd = new Command("new", "Create a new mod project for your game.")
+        var cmd = new Command("add", "Add another project from our starters kit.")
         {
-            CommandLineArgs.GameOption,
-            CommandLineArgs.InitialProjectNameOption,
+            // CommandLineArgs.ProjectNameArgument,
             CommandLineArgs.AssemblyNameOption,
-            CommandLineArgs.SolutionNameOption,
             CommandLineArgs.RootNamespaceOption,
-            CommandLineArgs.DotnetNewTemplateShortNameOption,
-            CommandLineArgs.JsonOption,
-            CommandLineArgs.ShowConfigOption,
-            CommandLineArgs.ShowFsOption
+            CommandLineArgs.DotnetNewTemplateShortNameOption.Hide()
         };
 
-        cmd.AddArgument(CommandLineArgs.EmptyDirectoryArgument);
+        cmd.AddArgument(CommandLineArgs.ProjectNameArgument);
+        cmd.AddArgument(CommandLineArgs.KickstartTemplateArgument.FromAmong(new []{ "AssetBundles", "StyledGUI" }));
+        cmd.AddArgument(CommandLineArgs.TargetArgument);
         cmd.SetHandler(
-            async (gameOptions, templateOptions, inJson, showConfig, showFs, dryRun, quiet) =>
+            async (gameOptions, templateOptions, dryRun, quiet) =>
             {
-                await Run(gameOptions, templateOptions, inJson, showConfig, showFs, dryRun, quiet);
+                await Run(gameOptions, templateOptions, dryRun, quiet);
             },
             new GameOptionsBinder(
                 CommandLineArgs.GameOption,
-                CommandLineArgs.EmptyDirectoryArgument),
+                CommandLineArgs.TargetArgument),
             new TemplateOptionsBinder(
                 CommandLineArgs.EmptyDirectoryArgument,
-                CommandLineArgs.InitialProjectNameOption,
+                CommandLineArgs.ProjectNameArgument,
                 CommandLineArgs.AssemblyNameOption,
                 CommandLineArgs.SolutionNameOption,
                 CommandLineArgs.RootNamespaceOption,
                 CommandLineArgs.DotnetNewTemplateShortNameOption),
-            CommandLineArgs.JsonOption,
-            CommandLineArgs.ShowConfigOption,
-            CommandLineArgs.ShowFsOption,
             CommandLineArgs.DryRunOption,
             CommandLineArgs.QuietOption
         );
@@ -55,21 +49,15 @@ public static class CommandNew
         return (Instance = cmd);
     }
 
-    private static async Task Run(GameOptions gameOptions, TemplateOptions templateOptions, bool inJson, 
-        bool showConfig, bool showFs, bool dryRun, bool quiet)
+    private static async Task Run(GameOptions gameOptions, TemplateOptions templateOptions, bool dryRun,
+        bool quiet)
     {
         var allOptions = new AllOptions(gameOptions.AsRecord(), templateOptions.AsRecord(), dryRun, quiet);
-
-        if (dryRun && quiet && !showFs && showConfig)
-        {
-            JsonLib.Print(new ShowOptions() { Config = allOptions });
-            return;
-        }
-        
         var shell = CommandShellBuilder.Create(allOptions);
 
         shell.OnAction += CommandLineHelper.DisplayCommandShellEntry;
 
+        /*
         var success =
             SafeInvoke.All(quiet,
 
@@ -106,23 +94,11 @@ public static class CommandNew
                 // TODO: [Preloader.Entrypoint]
                 // TODO: Type = MonoBehaviour
             );
-
-        if (showFs || showConfig)
-        {
-            if (inJson)
-            {
-                JsonLib.Print(new ShowOptions()
-                {
-                    Config = showConfig ? allOptions : null,
-                    FileSystem = showFs ? shell.Tree : null
-                });
-            }
-            else
-            {
-                // TODO
-            }
-        }
-
+        */
+        
+        JsonLib.Print(shell.Tree);
+        JsonLib.Print(allOptions);
+        
         shell.OnAction -= CommandLineHelper.DisplayCommandShellEntry;
     }
 }

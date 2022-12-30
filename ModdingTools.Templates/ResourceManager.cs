@@ -9,13 +9,13 @@ public class ResourceManager
 
     private ResourceManager()
     {
-        this.Assembly = this.GetType().Assembly;
-        this.resNames = this.Assembly.GetManifestResourceNames();
+        Assembly = GetType().Assembly;
+        resNames = Assembly.GetManifestResourceNames();
     }
 
     public Assembly Assembly { get; }
 
-    public Stream GetResource(string filename) => this.Assembly.GetManifestResourceStream(
-        ((IEnumerable<string>) this.resNames).First<string>(
-            (Func<string, bool>) (x => x.EndsWith(filename))));
+    public Stream GetResource(string filename) => Assembly.GetManifestResourceStream(
+        resNames.First(
+            x => x.EndsWith(filename)))!;
 }

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Xml.Linq;
 using ModdingTools.Core.Extensions;
 
 namespace ModdingTools.App.Binding;
@@ -22,7 +23,7 @@ public static class BindingOptionsHelper
                 if (d.GetDirectories("Managed").Length == 0)
                     continue;
 
-                if (location.GetFiles(gameName + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : "")).Length == 0)
+                if (GetGameExecutable(location, gameName) == default(FileInfo))
                     continue;
                 
                 isValidDirectory = true;
@@ -37,12 +38,17 @@ public static class BindingOptionsHelper
         return isValidDirectory ? gameName : "";
     }
 
-    public static string GetUnityPlayerVersion(DirectoryInfo location)
-    {
-        // UnityEngine.Modules v5.6.0 will be used when there's no UnityPlayer found
-        // or when it's version is older than 20XX.X.X
-        var version = "5.6.0";
+    private static FileInfo? GetGameExecutable(DirectoryInfo location, string gameName) =>
+        location
+            .GetFiles(gameName + (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : ""))
+            .FirstOrDefault(default(FileInfo));
 
+    public static string GetUnityPlayerVersion(DirectoryInfo? location)
+    {
+        // UnityEngine.Modules v5.6.0 will be used if no version is found.
+        var version = "5.6.0";
+        if (location == null) return version;
+        
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var unityPlayer = location.GetFiles("UnityPlayer*").FirstOrDefault(
@@ -54,6 +60,15 @@ public static class BindingOptionsHelper
                 version = FileVersionInfo.GetVersionInfo(unityPlayer.FullName).FileVersion;
                 version = version![..version!.LastIndexOf('.')];
             }
+            else
+            {
+                var binaryFile = GetGameExecutable(location, GetGameName(location));
+                if (binaryFile != default(FileInfo))
+                {
+                    version = FileVersionInfo.GetVersionInfo(binaryFile.FullName).FileVersion;
+                    version = version![..version!.LastIndexOf('.')];
+                }
+            }
         }
         else
         {
@@ -62,31 +77,42 @@ public static class BindingOptionsHelper
 
         return version;
     }
-    
-    public static string GetManagedFrameworkVersion(DirectoryInfo gamePath, string gameName)
+
+    public static string GetManagedFrameworkVersion(DirectoryInfo? gamePath, string gameName)
     {
         // The available values for TargetFrameworkVersion are v2.0, v3.0, v3.5, v4.5.2, v4.6, v4.6.1, v4.6.2, v4.7, v4.7.1, v4.7.2, and v4.8.
         var version = "net35";
+        if (gamePath == null) return version;
 
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
         {
             var managedDirectory = new DirectoryInfo(
                 Path.Combine(Path.Combine(gamePath.FullName, gameName + "_Data"), "Managed"));
-            
-            var matchingAssemblies = GetDllWithValidDotnetVersion(managedDirectory, "mscorlib*") 
+
+            var isUsingNetstandard = managedDirectory
+                .GetFile("Assembly-CSharp.dll")
+                ?.GetAssemblyReferences()
+                .Any(asm => asm.Name?.ToString().Contains("netstandard") ?? false) ?? false;
+
+            var matchingAssemblies = GetDllWithValidDotnetVersion(managedDirectory, isUsingNetstandard ? "netstandard*" : "mscorlib*") 
+                                     ?? GetDllWithValidDotnetVersion(managedDirectory, "mscorlib*")
                                      ?? GetDllWithValidDotnetVersion(managedDirectory, "System.Core*");
             
             if (matchingAssemblies != null)
             {
                 version = FileVersionInfo.GetVersionInfo(matchingAssemblies.FullName).FileVersion;
                 var (major, minor, _) = version!.Split('.').Select(int.Parse);
+                var isNetstandard = matchingAssemblies.Name.Contains("netstandard",
+                    StringComparison.InvariantCultureIgnoreCase);
 
                 version = major switch
                 {
                     4 when minor >= 6 => "net472",
                     4 => "net452",
                     3 => "net35",
-                    (< 3) => "netstandard2.1",
+                    (< 3) when isNetstandard && minor >= 1 => "netstandard2.1",
+                    (< 3) when isNetstandard && minor == 0 => "netstandard2.0",
+                    (< 3) when !isNetstandard => "net35",
                     5 => "net5.0",
                     6 => "net6.0",
                     7 => "net7.0",
@@ -116,4 +142,18 @@ public static class BindingOptionsHelper
                 return false;
             },
             null);
+    
+    public static DirectoryInfo? GetGamePathFromConfigurationFilesFrom(DirectoryInfo targetPath)
+    {
+        FileInfo? dbp = (targetPath.GetDirectory("src") ?? targetPath).GetFile("Directory.Build.props");
+        if (dbp == null) return null;
+        
+        XElement root = XElement.Load(dbp.FullName);
+        XElement? gamePathX = root.Elements("PropertyGroup")
+            .Where(el => el.HasElements && el.Elements("GAME_PATH").Any())
+            .FirstOrDefault(default(XElement))
+            ?.Element("GAME_PATH");
+
+        return gamePathX == null ? null : new DirectoryInfo(gamePathX.Value);
+    }
 }

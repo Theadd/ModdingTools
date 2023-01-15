@@ -21,10 +21,12 @@ class Program
         var infoCommand = CommandInfo.Create();
         var addCommand = CommandAdd.Create();
         var gameInfoCommand = CommandGameInfo.Create();
+        var bepInExCommand = CommandBepInEx.Create();
         rootCommand.AddCommand(createCommand);
         rootCommand.AddCommand(infoCommand);
         rootCommand.AddCommand(addCommand);
         rootCommand.AddCommand(gameInfoCommand);
+        rootCommand.AddCommand(bepInExCommand);
         
         try
         {

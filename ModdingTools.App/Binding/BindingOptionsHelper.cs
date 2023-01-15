@@ -156,4 +156,28 @@ public static class BindingOptionsHelper
 
         return gamePathX == null ? null : new DirectoryInfo(gamePathX.Value);
     }
+    
+    public static string GetBepInExVersion(DirectoryInfo? coreDirectoryLocation)
+    {
+        var version = "";
+        if (coreDirectoryLocation == null) return version;
+        
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            var targetDll = coreDirectoryLocation.GetFile("BepInEx.dll") ??
+                              coreDirectoryLocation.GetFile("BepInEx.Core.dll");
+            
+            if (targetDll != null)
+            {
+                version = FileVersionInfo.GetVersionInfo(targetDll.FullName).FileVersion;
+                // version = version![..version!.LastIndexOf('.')];
+            }
+        }
+        else
+        {
+            // TODO: OSPlatform.OSX
+        }
+
+        return version;
+    }
 }
